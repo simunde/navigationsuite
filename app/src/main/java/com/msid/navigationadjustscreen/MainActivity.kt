@@ -14,9 +14,13 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.msid.navigationadjustscreen.ui.theme.NavigationAdjustScreenTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,8 +37,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             var selectedItemIndex by remember {
-                mutableStateOf(0)
+                mutableIntStateOf(0)
             }
+
+            val windowWidthClass = currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass
 
             NavigationAdjustScreenTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -57,7 +64,18 @@ class MainActivity : ComponentActivity() {
                         )
 
                     }
-                   }){
+                   },
+                       layoutType = if (windowWidthClass == WindowWidthSizeClass.EXPANDED){
+                           NavigationSuiteType.NavigationDrawer
+
+                       }
+                       else{
+                           NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
+                               currentWindowAdaptiveInfo()
+                           )
+                       }
+
+                   ){
                        Box(modifier = Modifier.fillMaxSize(),
                            contentAlignment = Alignment.Center){
                            Screen.entries.forEachIndexed{ index, screen->
